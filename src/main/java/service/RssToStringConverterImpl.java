@@ -14,7 +14,7 @@ public class RssToStringConverterImpl implements RssToStringConverter{
             stringList.add(feed.getTitle());
             stringList.add(feed.getDescription());
             stringList.add(feed.getLink());
-            stringList.add("\n");
+            stringList.add(String.valueOf(' '));
         }
         return stringList;
     }

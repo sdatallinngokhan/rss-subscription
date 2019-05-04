@@ -76,7 +76,6 @@ public class UserServiceImpl implements UserService {
 
         String newUser = user.getUsername() + " " + user.getPassword() + " " + user.getUserRoleType().name() + " " + user.getSubscriptionType().name();
 
-        userList.add("\n");
         userList.add(newUser);
 
         fileService.writeFile(pathString, userList);
@@ -91,6 +90,9 @@ public class UserServiceImpl implements UserService {
         for (String userString : userListString) {
             User user = new User();
             String[] userStringArray = userString.split(" ");
+            if (userStringArray.length < 4) {
+                continue;
+            }
             user.setUsername(userStringArray[0]);
             user.setPassword(userStringArray[1]);
             user.setUserRoleType(UserRoleType.valueOf(userStringArray[2]));

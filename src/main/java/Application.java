@@ -1,9 +1,11 @@
 import com.rometools.rome.feed.synd.SyndFeed;
 import model.Feed;
+import model.SubscriptionType;
 import model.User;
 import model.UserRoleType;
 import service.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
@@ -30,16 +32,16 @@ public class Application {
         System.out.print("Your password : ");
         String password = scanner.nextLine();
 
-        User user = userService.getUser(username, password);
+        User loggedInUser = userService.getUser(username, password);
 
-        if (user == null) {
+        if (loggedInUser == null) {
             System.out.println("You are not registered yet!!");
             return;
         }
 
-        System.out.println("You successfully logged in as " + user);
+        System.out.println("You successfully logged in as " + loggedInUser);
         System.out.println();
-        String option = application.showOptionsAndGetOption(user.getUserRoleType().name());
+        String option = application.showOptionsAndGetOption(loggedInUser.getUserRoleType().name());
 
         if (option.equals("wrong option")) {
             System.out.println("You choice wrong option");
@@ -49,8 +51,8 @@ public class Application {
         SyndFeed syndFeed = rssService.readRss(RSS_URL);
         List<Feed> feedList = rssService.getFeedList(syndFeed);
         if (option.equals("1")) {
-            String writingPath = "/Users/gokhanpolat/Developer/rss-subscription/src/main/resources/rss_feeds/" + user.getUsername() + ".txt";
-            if (user.getSubscriptionType().name().equals("DEMO")) {
+            String writingPath = "/Users/gokhanpolat/Developer/rss-subscription/src/main/resources/rss_feeds/" + loggedInUser.getUsername() + ".txt";
+            if (loggedInUser.getSubscriptionType().name().equals("DEMO")) {
                 List<Feed> limitedFeedList = feedList.stream().limit(10).collect(Collectors.toList());
                 List<String> limitedFeedListString = rssToStringConverter.convert(limitedFeedList);
                 fileService.writeFile(writingPath, limitedFeedListString);
@@ -60,6 +62,30 @@ public class Application {
                 fileService.writeFile(writingPath, feedListString);
                 System.out.println("Your Rss Feed file has been created");
             }
+        } else if (option.equals("2")) {
+            System.out.println();
+            System.out.println("//// ADDING USER ////");
+            System.out.println();
+
+            User userCandidate = new User();
+            System.out.print("Username : ");
+            userCandidate.setUsername(scanner.nextLine());
+            System.out.print("Password : ");
+            userCandidate.setPassword(scanner.nextLine());
+
+            System.out.println("Current subscription options : " + Arrays.asList(SubscriptionType.values()));
+            System.out.print("Enter subscription type : ");
+            userCandidate.setSubscriptionType(SubscriptionType.valueOf(scanner.nextLine()));
+
+            if (loggedInUser.getUserRoleType().equals(UserRoleType.MODERATOR)) {
+                userCandidate.setUserRoleType(UserRoleType.CLIENT);
+            } else {
+                System.out.println("Current role types : " + Arrays.asList(UserRoleType.values()));
+                System.out.print("Enter role type : ");
+                userCandidate.setUserRoleType(UserRoleType.valueOf(scanner.nextLine()));
+            }
+
+            userService.saveUser(userCandidate);
         }
     }
 
