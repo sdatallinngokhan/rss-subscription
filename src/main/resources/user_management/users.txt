@@ -1,2 +1,2 @@
 rssmanager 123qwe ADMIN FULL
-rssmoderator 123qwe MODERATOR FULL
+rssmoderator 123ewq MODERATOR FULL
