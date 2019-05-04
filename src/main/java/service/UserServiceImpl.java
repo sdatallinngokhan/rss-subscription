@@ -30,6 +30,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User getUser(String username, String password) {
+        List<User> userList = getUserList();
+
+        for (User user : userList) {
+            if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
+                return user;
+            }
+        }
+
+        return null;
+    }
+
+    @Override
     public void saveUser(User user) {
         String username = user.getUsername();
         String password = user.getPassword();
@@ -37,14 +50,14 @@ public class UserServiceImpl implements UserService {
         char[] passwordArray = password.toCharArray();
 
         for (char u : usernameArray) {
-            if (u == ' '){
+            if (u == ' ') {
                 System.out.println("Username contains space. Please save username without space");
                 return;
             }
         }
 
         for (char p : passwordArray) {
-            if (p == ' '){
+            if (p == ' ') {
                 System.out.println("Password contains space. Please save password without space");
                 return;
             }
