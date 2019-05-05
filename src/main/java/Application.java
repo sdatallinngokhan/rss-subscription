@@ -152,10 +152,12 @@ public class Application {
             System.out.println("2. Add User");
             System.out.println("3. Update User");
             System.out.println("4. Delete User");
+            System.out.println("5. Logout");
             System.out.print("Your option? : ");
             option = scanner.nextLine();
         } else {
             System.out.println("1. Get Feed List");
+            System.out.println("5. Logout");
             System.out.print("Your option? : ");
             option = scanner.nextLine();
         }
