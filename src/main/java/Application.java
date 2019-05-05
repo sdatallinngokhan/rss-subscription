@@ -95,6 +95,7 @@ public class Application {
             String usernameToUpdate = scanner.nextLine();
 
             User updatedUserInfo = new User();
+            updatedUserInfo.setUsername(usernameToUpdate);
             System.out.print("New password?: ");
             updatedUserInfo.setPassword(scanner.nextLine());
 
@@ -106,7 +107,7 @@ public class Application {
             System.out.print("New subscription type?: ");
             updatedUserInfo.setSubscriptionType(SubscriptionType.valueOf(scanner.nextLine()));
 
-            String message = userService.updateUser(loggedInUser, usernameToUpdate, updatedUserInfo);
+            String message = userService.updateUser(loggedInUser, updatedUserInfo);
 
             System.out.println(message);
         } else if (option.equals("4")) {

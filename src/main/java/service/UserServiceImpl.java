@@ -144,13 +144,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String updateUser(User loggedInUser, String usernameToUpdate, User updatedUserInfo) {
-        User userToUpdate = getUser(usernameToUpdate);
+    public String updateUser(User loggedInUser, User updatedUserInfo) {
+        User userToUpdate = getUser(updatedUserInfo.getUsername());
         List<User> userList = getUserList();
 
         List<User> refreshedUserList = new ArrayList<>();
         for (User user : userList) {
-            if (user.getUsername().equals(usernameToUpdate)) {
+            if (user.getUsername().equals(updatedUserInfo.getUsername())) {
                 if (user.getUserRoleType().equals(UserRoleType.ADMIN) && loggedInUser.getUserRoleType().equals(UserRoleType.MODERATOR)) {
                     return "You are not allowed for this operation!!";
                 }
@@ -179,6 +179,6 @@ public class UserServiceImpl implements UserService {
 
         fileService.writeFile(USERS_TXT_PATH, refreshedUserListString);
 
-        return usernameToUpdate + " was updated successfully with new info";
+        return updatedUserInfo.getUsername() + " was updated successfully with new info";
     }
 }
