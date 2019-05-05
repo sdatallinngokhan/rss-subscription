@@ -13,4 +13,6 @@ public interface UserService {
     List<User> getUserList();
 
     String deleteUser(User loggedInUser, String usernameToDelete);
+
+    String updateUser(User loggedInUser, String usernameToUpdate, User updatedUserInfo);
 }

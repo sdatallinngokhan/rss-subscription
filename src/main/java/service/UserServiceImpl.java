@@ -142,4 +142,43 @@ public class UserServiceImpl implements UserService {
 
         return "You successfully deleted " + usernameToDelete;
     }
+
+    @Override
+    public String updateUser(User loggedInUser, String usernameToUpdate, User updatedUserInfo) {
+        User userToUpdate = getUser(usernameToUpdate);
+        List<User> userList = getUserList();
+
+        List<User> refreshedUserList = new ArrayList<>();
+        for (User user : userList) {
+            if (user.getUsername().equals(usernameToUpdate)) {
+                if (user.getUserRoleType().equals(UserRoleType.ADMIN) && loggedInUser.getUserRoleType().equals(UserRoleType.MODERATOR)) {
+                    return "You are not allowed for this operation!!";
+                }
+
+                userToUpdate.setUsername(user.getUsername());
+                userToUpdate.setPassword(updatedUserInfo.getPassword());
+                userToUpdate.setSubscriptionType(updatedUserInfo.getSubscriptionType());
+
+                if (loggedInUser.getUserRoleType().equals(UserRoleType.MODERATOR)) {
+                    userToUpdate.setUserRoleType(user.getUserRoleType());
+                } else {
+                    userToUpdate.setUserRoleType(updatedUserInfo.getUserRoleType());
+                }
+
+                refreshedUserList.add(userToUpdate);
+            } else {
+                refreshedUserList.add(user);
+            }
+        }
+
+        List<String> refreshedUserListString = new ArrayList<>();
+        for (User refreshedUser : refreshedUserList) {
+            String refreshedUserString = refreshedUser.getUsername() + " " + refreshedUser.getPassword() + " " + refreshedUser.getUserRoleType().name() + " " + refreshedUser.getSubscriptionType().name();
+            refreshedUserListString.add(refreshedUserString);
+        }
+
+        fileService.writeFile(USERS_TXT_PATH, refreshedUserListString);
+
+        return usernameToUpdate + " was updated successfully with new info";
+    }
 }

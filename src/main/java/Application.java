@@ -91,7 +91,24 @@ public class Application {
             System.out.println("/// UPDATING USER ///");
             System.out.println();
 
+            System.out.print("Which user(username) you want to update? : ");
+            String usernameToUpdate = scanner.nextLine();
 
+            User updatedUserInfo = new User();
+            System.out.print("New password?: ");
+            updatedUserInfo.setPassword(scanner.nextLine());
+
+            if (loggedInUser.getUserRoleType().equals(UserRoleType.ADMIN)) {
+                System.out.print("New role type?: ");
+                updatedUserInfo.setUserRoleType(UserRoleType.valueOf(scanner.nextLine()));
+            }
+
+            System.out.print("New subscription type?: ");
+            updatedUserInfo.setSubscriptionType(SubscriptionType.valueOf(scanner.nextLine()));
+
+            String message = userService.updateUser(loggedInUser, usernameToUpdate, updatedUserInfo);
+
+            System.out.println(message);
         } else if (option.equals("4")) {
             System.out.println();
             System.out.println("/// DELETING USER ///");
