@@ -9,11 +9,12 @@ import java.util.List;
 
 public class UserServiceImpl implements UserService {
 
-    FileService fileService = new FileServiceImpl();
+    private final FileService fileService = new FileServiceImpl();
+    private final String USERS_TXT_PATH = "/Users/gokhanpolat/Developer/rss-subscription/src/main/resources/user_management/users.txt";
 
     @Override
     public User getUser(String username) {
-        List<String> userList = fileService.readFile("/Users/gokhanpolat/Developer/rss-subscription/src/main/resources/user_management/users.txt");
+        List<String> userList = fileService.readFile(USERS_TXT_PATH);
 
         User user = new User();
         for (String userString : userList) {
@@ -102,5 +103,43 @@ public class UserServiceImpl implements UserService {
         }
 
         return userList;
+    }
+
+    @Override
+    public String deleteUser(User loggedInUser, String usernameToDelete) {
+        List<User> userList = getUserList();
+        User userToDelete = getUser(usernameToDelete);
+
+        List<User> refreshedUserList = new ArrayList<>();
+        for (User user : userList) {
+//          if (userToDelete.getUsername().equals(user.getUsername())) { // might get NullPointerException
+            if (user.getUsername().equals(userToDelete.getUsername())) {
+                if (userToDelete.getUsername().equals(loggedInUser.getUsername())) {
+                    return "You can not delete yourself!!";
+                }
+
+                if (!userToDelete.getUserRoleType().equals(UserRoleType.CLIENT) && loggedInUser.getUserRoleType().equals(UserRoleType.MODERATOR)) {
+                    return "You are not permitted for this operation!!";
+                }
+
+                continue;
+            }
+
+            refreshedUserList.add(user);
+        }
+
+        if (userList.size() == refreshedUserList.size()) {
+            return usernameToDelete + " is not exist!!";
+        }
+
+        List<String> refreshedUserListString = new ArrayList<>();
+        for (User refreshedUser : refreshedUserList) {
+            String refreshedUserString = refreshedUser.getUsername() + " " + refreshedUser.getPassword() + " " + refreshedUser.getUserRoleType().name() + " " + refreshedUser.getSubscriptionType().name();
+            refreshedUserListString.add(refreshedUserString);
+        }
+
+        fileService.writeFile(USERS_TXT_PATH, refreshedUserListString);
+
+        return "You successfully deleted " + usernameToDelete;
     }
 }

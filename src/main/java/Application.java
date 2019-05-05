@@ -39,7 +39,7 @@ public class Application {
             return;
         }
 
-        System.out.println("You successfully logged in as " + loggedInUser);
+        System.out.println("You successfully logged in as " + loggedInUser.getUserRoleType().name());
         System.out.println();
         String option = application.showOptionsAndGetOption(loggedInUser.getUserRoleType().name());
 
@@ -86,6 +86,21 @@ public class Application {
             }
 
             userService.saveUser(userCandidate);
+        } else if (option.equals("3")) {
+            System.out.println();
+            System.out.println("/// UPDATING USER ///");
+            System.out.println();
+
+
+        } else if (option.equals("4")) {
+            System.out.println();
+            System.out.println("/// DELETING USER ///");
+            System.out.println();
+
+            System.out.print("Which username you want to delete? : ");
+            String usernameToDelete = scanner.nextLine();
+            String message = userService.deleteUser(loggedInUser, usernameToDelete);
+            System.out.println(message);
         }
     }
 
