@@ -13,8 +13,10 @@ import java.util.stream.Collectors;
 public class Application {
 
     private static Scanner scanner = new Scanner(System.in);
+    private static FileService fileService = new FileServiceImpl();
 
     public static final String RSS_URL = "http://feeds.bbci.co.uk/news/world/rss.xml";
+    public static final String SESSION_TXT_PATH = "/Users/gokhanpolat/Developer/rss-subscription/src/main/resources/user_management/session.txt";
 
     public static void main(String[] args) {
         System.out.println("////// WELCOME TO RSS FEED ///////");
@@ -25,15 +27,8 @@ public class Application {
         Application application = new Application();
         RssService rssService = new RssServiceImpl();
         RssToStringConverter rssToStringConverter = new RssToStringConverterImpl();
-        FileService fileService = new FileServiceImpl();
 
-        System.out.print("Your username : ");
-        String username = scanner.nextLine();
-        System.out.print("Your password : ");
-        String password = scanner.nextLine();
-
-        User loggedInUser = userService.getUser(username, password);
-
+        User loggedInUser = application.getCurrentUser(userService);
         if (loggedInUser == null) {
             System.out.println("You are not registered yet!!");
             return;
@@ -120,6 +115,34 @@ public class Application {
             String message = userService.deleteUser(loggedInUser, usernameToDelete);
             System.out.println(message);
         }
+    }
+
+    private User getCurrentUser(UserService userService) {
+        List<String> sessionList = fileService.readFile(SESSION_TXT_PATH);
+        String session = sessionList.get(0);
+        String[] sessionArray = session.split(" ");
+        String username = sessionArray[0];
+        long lastLoginMillis = Long.parseLong(sessionArray[1]);
+
+        User loggedInUser = new User();
+        if (System.currentTimeMillis() - lastLoginMillis < 180000) {
+            loggedInUser = userService.getUser(username);
+        } else {
+            System.out.print("Your username : ");
+            username = scanner.nextLine();
+
+            System.out.print("Your password : ");
+            String password = scanner.nextLine();
+
+            loggedInUser = userService.getUser(username, password);
+        }
+
+        if (loggedInUser != null){
+            List<String> updatedSession = Arrays.asList(username + " " + System.currentTimeMillis());
+            fileService.writeFile(SESSION_TXT_PATH, updatedSession);
+        }
+
+        return loggedInUser;
     }
 
     private String showOptionsAndGetOption(String roleType) {
